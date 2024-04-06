@@ -10,7 +10,7 @@ class Product(models.Model):
 
 class Customer(models.Model):
     name = models.CharField(max_length=100,null=True)
-    email = models.EmailField(unique=True,null=True)  # Adding unique constraint
+    email = models.EmailField(unique=True,null=True)  
 
     def __str__(self):
         return self.name

@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 import dj_database_url
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -91,24 +90,23 @@ WSGI_APPLICATION = 'mallBackend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'backend',
-        'USER': 'postgres',
-        'PASSWORD': 'Mahesh',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
-
 # DATABASES = {
-#     'default': dj_database_url.config(
-#         # Replace this value with your local database's connection string.
-#         default='postgresql://mallbackend_user:ACCDRicCUF7sn9mCkOswutTHEKcvOd9A@dpg-co8jflgl5elc738vu2o0-a:5432/mallbackend',
-#         conn_max_age=600
-#     )
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'backend',
+#         'USER': 'postgres',
+#         'PASSWORD': 'Mahesh',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
 # }
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default='postgresql://mallbackend_user:ACCDRicCUF7sn9mCkOswutTHEKcvOd9A@dpg-co8jflgl5elc738vu2o0-a:5432/mallbackend',
+        conn_max_age=600
+    )
+}
 
 
 AUTH_USER_MODEL = 'billingsystem.Employee'
@@ -159,6 +157,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Shopping Mall API',
     'DESCRIPTION': 'API documentation for the Shopping Mall backend',
-    # Add more settings as needed
 }
-ALLOWED_HOSTS = ['mallbackend-1.onrender.com']
+ALLOWED_HOSTS = ['mallbackend-1.onrender.com','127.0.0.1']
