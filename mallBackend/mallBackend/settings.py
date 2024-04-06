@@ -161,4 +161,4 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API documentation for the Shopping Mall backend',
     # Add more settings as needed
 }
-ALLOWED_HOSTS = ['mallbackend-1.onrender.com','127.0.0.1']
+ALLOWED_HOSTS = ['mallbackend-1.onrender.com']
