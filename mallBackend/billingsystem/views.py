@@ -40,7 +40,6 @@ class SaleListCreateView(generics.ListCreateAPIView):
     serializer_class = SaleSerializer
 class EmployeeSerializer(serializers.Serializer):
     employee__username = serializers.CharField()
-    print(employee__username)
     total_sales = serializers.IntegerField()
 
 class AnalyticsAPIView(generics.ListAPIView):
@@ -55,10 +54,6 @@ def login_view(request):
             user = Employee.objects.get(username=username)
         except Employee.DoesNotExist:
             user = None
-        print(user)
-        print(user.password)
-        print(password)
-
         if user is not None and password == user.password:
             login(request, user)
             return render(request, 'home.html')
@@ -66,7 +61,6 @@ def login_view(request):
         return JsonResponse({'success': False, 'message': 'Invalid username or password'}, status=400)
     elif request.method == 'GET':
         signup_form = SignupForm()
-        print(signup)
         return render(request, 'signup.html', {'form': signup_form})
 def signup(request):
     if request.method == 'POST':
@@ -79,7 +73,6 @@ def signup(request):
             return JsonResponse({'success': False, 'errors': signup_form.errors}, status=400)
     elif request.method == 'GET':
         signup_form = SignupForm()
-        print(signup)
         return render(request, 'signup.html', {'form': signup_form})
     else:
         return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
