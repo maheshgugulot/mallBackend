@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Operations</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Operations</h1>
+
+    <!-- Navigation buttons/links -->
+    <div>
+        <button id="itemsBtn">View Items</button>
+        <button id="customersBtn">View Customers</button>
+        <button id="salesBtn">View Sales</button>
+        <button id="analyticsBtn">View Analytics</button>
+    </div>
+
+    <!-- Content area -->
+    <div id="content"></div>
+    <form id="loginForm" action="/logout/" method="POST"> 
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>        
+        <!-- JavaScript code -->
+        <script>
+            $(document).ready(function() {
+                // Load default view (items)
+                loadItems();
+    
+                // Add click event listeners to navigation buttons/links
+                $('#itemsBtn').click(loadItems);
+                $('#customersBtn').click(loadCustomers);
+                $('#salesBtn').click(loadSales);
+                $('#analyticsBtn').click(loadAnalytics);
+    
+                // Function to load items
+                function loadItems() {
+                    fetch('{% url "product-list-create" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display existing items in a table
+                        let html = '<h2>Items</h2>';
+                        html += '<table>';
+                        html += '<thead><tr><th>Name</th><th>Price</th></tr></thead>';
+                        html += '<tbody>';
+                        data.forEach(item => {
+                            html += '<tr><td>' + item.name + '</td><td>' + item.price + '</td></tr>';
+                        });
+                        html += '</tbody></table>';
+                        html += '<h3>Add New Item</h3>';
+                        html += '<input type="text" id="itemName" placeholder="Enter Name">';
+                        html += '<input type="number" id="itemPrice" placeholder="Enter Price">';
+                        html += '<button id="addItemBtn">Add Item</button>';
+    
+                        // Update content area with HTML
+                        $('#content').html(html);
+                        $('#addItemBtn').click(addItem);
+    
+                    });
+                }
+    
+                // Function to load customers
+                function loadCustomers() {
+                    fetch('{% url "customer-list-create" %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display existing customers in a table
+                        let html = '<h2>Customers</h2>';
+                        html += '<table>';
+                        html += '<thead><tr><th>Name</th><th>Email</th></tr></thead>';
+                        html += '<tbody>';
+                        data.forEach(customer => {
+                            html += '<tr><td>' + customer.name + '</td><td>' + customer.email + '</td></tr>';
+                        });
+                        html += '</tbody></table>';
+                        html += '<h3>Add New Customer</h3>';
+                        html += '<input type="text" id="customerName" placeholder="Enter Name">';
+                        html += '<input type="email" id="customerEmail" placeholder="Enter Email">';
+                        html += '<button id="addCustomerBtn">Add Customer</button>';
+    
+                        // Update content area with HTML
+                        $('#content').html(html);
+                        $('#addCustomerBtn').click(addCustomer);
+    
+                    });
+                }
+    // Function to load sales
+    async function loadSales() {
+        try {
+            const response = await fetch('{% url "sale-list-create" %}');
+            const data = await response.json();
+    
+            // Display existing sales in a table
+            let html = '<h2>Sales</h2>';
+            html += '<table>';
+            html += '<thead><tr><th>Product</th><th>Price</th><th>Customer</th><th>Employee</th><th>Quantity</th><th>Total Amount</th><th>Timestamp</th></tr></thead>';
+            html += '<tbody>';
+    
+            // Function to fetch specific item details
+            async function fetchItemDetails(itemId, itemType) {
+                const itemResponse = await fetch(`/api/${itemType}s/${itemId}/`);
+                return await itemResponse.json();
+            }
+    
+            for (const sale of data) {
+                const [product, customer, employee] = await Promise.all([
+                    fetchItemDetails(sale.product, 'product'),
+                    fetchItemDetails(sale.customer, 'customer'),
+                    fetchItemDetails(sale.employee, 'employee')
+                ]);
+    
+                // Display sale details with specific item names and price
+                html += '<tr><td>' + product.name + '</td><td>' + product.price + '</td><td>' + customer.name + '</td><td>' + employee.username + '</td><td>' + sale.quantity + '</td><td>' + sale.total_amount + '</td><td>' + sale.timestamp + '</td></tr>';
+            }
+    
+            html += '</tbody></table>';
+    
+            // Add input fields for adding new sale
+            html += '<h3>Add New Sale</h3>';
+            html += '<select id="productSelect"></select>';
+            html += '<select id="customerSelect"></select>';
+            html += '<select id="employeeSelect"></select>';
+            html += '<input type="number" id="quantity" placeholder="Enter Quantity">';
+            html += '<button id="addSaleBtn">Add Sale</button>';
+    
+            // Update content area with HTML
+            $('#content').html(html);
+    
+            // Populate dropdowns for products, customers, and employees
+            const [products, customers, employees] = await Promise.all([
+                fetch('{% url "product-list-create" %}').then(response => response.json()),
+                fetch('{% url "customer-list-create" %}').then(response => response.json()),
+                fetch('{% url "employee-list-create" %}').then(response => response.json())
+            ]);
+    
+            products.forEach(product => {
+                $('#productSelect').append('<option value="' + product.id + '">' + product.name + '</option>');
+            });
+    
+            customers.forEach(customer => {
+                $('#customerSelect').append('<option value="' + customer.id + '">' + customer.name + '</option>');
+            });
+    
+            employees.forEach(employee => {
+                $('#employeeSelect').append('<option value="' + employee.id + '">' + employee.username + '</option>');
+            });
+    
+            // Add click event listener to add sale button
+            $('#addSaleBtn').click(addSale);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    
+            function loadAnalytics() {
+                            fetch('/api/analytics/')
+                            .then(response => response.json())
+                            .then(data => {
+                                let html = '<h2>Analytics</h2>';
+                                html += '<table>';
+                                html += '<thead><tr><th>Employee</th><th>Total Sales</th></tr></thead>';
+                                html += '<tbody>';
+                                data.forEach(analytic => {
+                                    html += '<tr><td>' + analytic.employee__username + '</td><td>' + analytic.total_sales + '</td></tr>';
+                                });
+                                html += '</tbody></table>';
+                                $('#content').html(html);
+                            });
+                        }
+    
+    
+                // Function to add new sale
+                function addSale() {
+                    const productId = parseInt($('#productSelect').val());
+                    const customerId = parseInt($('#customerSelect').val());
+                    const employeeId = parseInt($('#employeeSelect').val());
+                    const quantity = parseInt($('#quantity').val());
+    
+                    // Calculate total amount based on the selected product's price and the entered quantity
+                    fetch('/api/products/' + productId + '/')
+                    .then(response => response.json())
+                    .then(product => {
+                        const totalAmount = product.price * quantity;
+    
+                        // Create sale object with primary key values
+                        const saleData = {
+                            product: productId,
+                            customer: customerId,
+                            employee: employeeId,
+                            quantity: quantity,
+                            total_amount: totalAmount
+                        };
+    
+                        // POST request to add new sale
+                        fetch('{% url "sale-list-create" %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(saleData)
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // Reload sales after adding new sale
+                                loadSales();
+                            } else {
+                                // Handle error
+                                console.error('Failed to add sale');
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+    
+                // Function to add new item
+                function addItem() {
+                    const name = $('#itemName').val();
+                    const price = $('#itemPrice').val();
+    
+                    fetch('{% url "product-list-create" %}', {
+                        method: 'POST',
+                        body: JSON.stringify({ name: name, price: price }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(loadItems); // Reload items after adding new item
+                }
+    
+                // Function to add new customer
+                function addCustomer() {
+                    const name = $('#customerName').val();
+                    const email = $('#customerEmail').val();
+    
+                    fetch('{% url "customer-list-create" %}', {
+                        method: 'POST',
+                        body: JSON.stringify({ name: name, email: email }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(loadCustomers); // Reload customers after adding new customer
+                }
+            });
+        </script>
+    </body>
+    </html>
+    
+
+    
