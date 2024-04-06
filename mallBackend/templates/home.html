@@ -21,81 +21,90 @@
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>        
-        <script>
-            $(document).ready(function() {
-                
-                loadItems();
-    
-                
-                $('#itemsBtn').click(loadItems);
-                $('#customersBtn').click(loadCustomers);
-                $('#salesBtn').click(loadSales);
-                $('#analyticsBtn').click(loadAnalytics);
-    
-                
-                function loadItems() {
-                    fetch('{% url "product-list-create" %}')
-                    .then(response => response.json())
-                    .then(data => {
-                        
-                        let html = '<h2>Items</h2>';
-                        html += '<table>';
-                        html += '<thead><tr><th>Name</th><th>Price</th></tr></thead>';
-                        html += '<tbody>';
-                        data.forEach(item => {
-                            html += '<tr><td>' + item.name + '</td><td>' + item.price + '</td></tr>';
-                        });
-                        html += '</tbody></table>';
-                        html += '<h3>Add New Item</h3>';
-                        html += '<input type="text" id="itemName" placeholder="Enter Name">';
-                        html += '<input type="number" id="itemPrice" placeholder="Enter Price">';
-                        html += '<button id="addItemBtn">Add Item</button>';
-    
-                        
-                        $('#content').html(html);
-                        $('#addItemBtn').click(addItem);
-    
+    <script>
+        $(document).ready(function() {
+            loadItems();
+
+            $('#itemsBtn').click(loadItems);
+            $('#customersBtn').click(loadCustomers);
+            $('#salesBtn').click(loadSales);
+            $('#analyticsBtn').click(loadAnalytics);
+
+            async function loadItems() {
+                try {
+                    const response = await fetch('{% url "product-list-create" %}');
+                    const data = await response.json();
+                    
+                    let html = '<h2>Items</h2>';
+                    html += '<table>';
+                    html += '<thead><tr><th>Name</th><th>Price</th><th>Actions</th></tr></thead>';
+                    html += '<tbody>';
+                    data.forEach(item => {
+                        html += '<tr><td>' + item.name + '</td><td>' + item.price + '</td>';
+                        html += '<td><button class="updateItemBtn" data-id="' + item.id + '">Update</button>';
+                        html += '<button class="deleteItemBtn" data-id="' + item.id + '">Delete</button></td></tr>';
                     });
+                    html += '</tbody></table>';
+                    html += '<h3>Add New Item</h3>';
+                    html += '<input type="text" id="itemName" placeholder="Enter Name">';
+                    html += '<input type="number" id="itemPrice" placeholder="Enter Price">';
+                    html += '<button id="addItemBtn">Add Item</button>';
+
+                    
+                    $('#content').html(html);
+                    $('#addItemBtn').click(addItem);
+
+                    
+                    $('.updateItemBtn').click(updateItem);
+                    $('.deleteItemBtn').click(deleteItem);
+
+                } catch (error) {
+                    console.error('Error:', error);
                 }
-    
-                
-                function loadCustomers() {
-                    fetch('{% url "customer-list-create" %}')
-                    .then(response => response.json())
-                    .then(data => {
-                        
-                        let html = '<h2>Customers</h2>';
-                        html += '<table>';
-                        html += '<thead><tr><th>Name</th><th>Email</th></tr></thead>';
-                        html += '<tbody>';
-                        data.forEach(customer => {
-                            html += '<tr><td>' + customer.name + '</td><td>' + customer.email + '</td></tr>';
-                        });
-                        html += '</tbody></table>';
-                        html += '<h3>Add New Customer</h3>';
-                        html += '<input type="text" id="customerName" placeholder="Enter Name">';
-                        html += '<input type="email" id="customerEmail" placeholder="Enter Email">';
-                        html += '<button id="addCustomerBtn">Add Customer</button>';
-    
-                        
-                        $('#content').html(html);
-                        $('#addCustomerBtn').click(addCustomer);
-    
+            }
+
+            async function loadCustomers() {
+                try {
+                    const response = await fetch('{% url "customer-list-create" %}');
+                    const data = await response.json();
+                    
+                    let html = '<h2>Customers</h2>';
+                    html += '<table>';
+                    html += '<thead><tr><th>Name</th><th>Email</th><th>Actions</th></tr></thead>';
+                    html += '<tbody>';
+                    data.forEach(customer => {
+                        html += '<tr><td>' + customer.name + '</td><td>' + customer.email + '</td>';
+                        html += '<td><button class="updateCustomerBtn" data-id="' + customer.id + '">Update</button>';
+                        html += '<button class="deleteCustomerBtn" data-id="' + customer.id + '">Delete</button></td></tr>';
                     });
+                    html += '</tbody></table>';
+                    html += '<h3>Add New Customer</h3>';
+                    html += '<input type="text" id="customerName" placeholder="Enter Name">';
+                    html += '<input type="email" id="customerEmail" placeholder="Enter Email">';
+                    html += '<button id="addCustomerBtn">Add Customer</button>';
+
+                    
+                    $('#content').html(html);
+                    $('#addCustomerBtn').click(addCustomer);
+
+                    
+                    $('.updateCustomerBtn').click(updateCustomer);
+                    $('.deleteCustomerBtn').click(deleteCustomer);
+
+                } catch (error) {
+                    console.error('Error:', error);
                 }
-    
-    async function loadSales() {
+            }
+            async function loadSales() {
         try {
             const response = await fetch('{% url "sale-list-create" %}');
             const data = await response.json();
     
-            
             let html = '<h2>Sales</h2>';
             html += '<table>';
             html += '<thead><tr><th>Product</th><th>Price</th><th>Customer</th><th>Employee</th><th>Quantity</th><th>Total Amount</th><th>Timestamp</th></tr></thead>';
             html += '<tbody>';
     
-            
             async function fetchItemDetails(itemId, itemType) {
                 const itemResponse = await fetch(`/api/${itemType}s/${itemId}/`);
                 return await itemResponse.json();
@@ -108,13 +117,11 @@
                     fetchItemDetails(sale.employee, 'employee')
                 ]);
     
-                
                 html += '<tr><td>' + product.name + '</td><td>' + product.price + '</td><td>' + customer.name + '</td><td>' + employee.username + '</td><td>' + sale.quantity + '</td><td>' + sale.total_amount + '</td><td>' + sale.timestamp + '</td></tr>';
             }
     
             html += '</tbody></table>';
     
-            
             html += '<h3>Add New Sale</h3>';
             html += '<select id="productSelect"></select>';
             html += '<select id="customerSelect"></select>';
@@ -122,10 +129,8 @@
             html += '<input type="number" id="quantity" placeholder="Enter Quantity">';
             html += '<button id="addSaleBtn">Add Sale</button>';
     
-            
             $('#content').html(html);
     
-            
             const [products, customers, employees] = await Promise.all([
                 fetch('{% url "product-list-create" %}').then(response => response.json()),
                 fetch('{% url "customer-list-create" %}').then(response => response.json()),
@@ -144,45 +149,22 @@
                 $('#employeeSelect').append('<option value="' + employee.id + '">' + employee.username + '</option>');
             });
     
-            
             $('#addSaleBtn').click(addSale);
         } catch (error) {
             console.error('Error:', error);
         }
     }
-    
-    
-            function loadAnalytics() {
-                            fetch('/api/analytics/')
-                            .then(response => response.json())
-                            .then(data => {
-                                let html = '<h2>Analytics</h2>';
-                                html += '<table>';
-                                html += '<thead><tr><th>Employee</th><th>Total Sales</th></tr></thead>';
-                                html += '<tbody>';
-                                data.forEach(analytic => {
-                                    html += '<tr><td>' + analytic.employee__username + '</td><td>' + analytic.total_sales + '</td></tr>';
-                                });
-                                html += '</tbody></table>';
-                                $('#content').html(html);
-                            });
-                        }
-    
-    
-                
                 function addSale() {
                     const productId = parseInt($('#productSelect').val());
                     const customerId = parseInt($('#customerSelect').val());
                     const employeeId = parseInt($('#employeeSelect').val());
                     const quantity = parseInt($('#quantity').val());
     
-                    
                     fetch('/api/products/' + productId + '/')
                     .then(response => response.json())
                     .then(product => {
                         const totalAmount = product.price * quantity;
     
-                        
                         const saleData = {
                             product: productId,
                             customer: customerId,
@@ -191,7 +173,6 @@
                             total_amount: totalAmount
                         };
     
-                        
                         fetch('{% url "sale-list-create" %}', {
                             method: 'POST',
                             headers: {
@@ -201,10 +182,8 @@
                         })
                         .then(response => {
                             if (response.ok) {
-                                
                                 loadSales();
                             } else {
-                                
                                 console.error('Failed to add sale');
                             }
                         })
@@ -212,40 +191,176 @@
                     })
                     .catch(error => console.error('Error:', error));
                 }
-    
-                
-                function addItem() {
-                    const name = $('#itemName').val();
-                    const price = $('#itemPrice').val();
-    
-                    fetch('{% url "product-list-create" %}', {
-                        method: 'POST',
-                        body: JSON.stringify({ name: name, price: price }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(loadItems); 
-                }
-    
-                
-                function addCustomer() {
-                    const name = $('#customerName').val();
-                    const email = $('#customerEmail').val();
-    
-                    fetch('{% url "customer-list-create" %}', {
-                        method: 'POST',
-                        body: JSON.stringify({ name: name, email: email }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(loadCustomers); 
-                }
-            });
-        </script>
-    </body>
-    </html>
-    
 
-    
+
+            async function loadAnalytics() {
+                try {
+                    const response = await fetch('/api/analytics/');
+                    const data = await response.json();
+                    
+                    let html = '<h2>Analytics</h2>';
+                    html += '<table>';
+                    html += '<thead><tr><th>Employee</th><th>Total Sales</th></tr></thead>';
+                    html += '<tbody>';
+                    data.forEach(analytic => {
+                        html += '<tr><td>' + analytic.employee__username + '</td><td>' + analytic.total_sales + '</td></tr>';
+                    });
+                    html += '</tbody></table>';
+                    
+                    $('#content').html(html);
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            async function addItem() {
+                const name = $('#itemName').val();
+                const price = $('#itemPrice').val();
+
+                try {
+                    const response = await fetch('{% url "product-list-create" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: name, price: price })
+                    });
+
+                    if (response.ok) {
+                        loadItems();
+                    } else {
+                        console.error('Failed to add item');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            async function addCustomer() {
+                const name = $('#customerName').val();
+                const email = $('#customerEmail').val();
+
+                try {
+                    const response = await fetch('{% url "customer-list-create" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: name, email: email })
+                    });
+
+                    if (response.ok) {
+                        loadCustomers();
+                    } else {
+                        console.error('Failed to add customer');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            async function updateItem() {
+                const itemId = $(this).data('id');
+                try {
+                    const response = await fetch(`/api/products/${itemId}/`);
+                    const item = await response.json();
+                    $('#itemName').val(item.name);
+                    $('#itemPrice').val(item.price);
+                    $('#addItemBtn').text('Update Item').off('click').on('click', async function() {
+                        const updatedName = $('#itemName').val();
+                        const updatedPrice = $('#itemPrice').val();
+                        const updatedItemData = { name: updatedName, price: updatedPrice };
+                        try {
+                            const updateResponse = await fetch(`/api/products/${itemId}/`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(updatedItemData)
+                            });
+                            if (updateResponse.ok) {
+                                loadItems();
+                            } else {
+                                console.error('Failed to update item');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            async function deleteItem() {
+                const itemId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this item?')) {
+                    try {
+                        const response = await fetch(`/api/products/${itemId}/`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            loadItems();
+                        } else {
+                            console.error('Failed to delete item');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            }
+
+            async function updateCustomer() {
+                const customerId = $(this).data('id');
+                try {
+                    const response = await fetch(`/api/customers/${customerId}/`);
+                    const customer = await response.json();
+                    $('#customerName').val(customer.name);
+                    $('#customerEmail').val(customer.email);
+                    $('#addCustomerBtn').text('Update Customer').off('click').on('click', async function() {
+                        const updatedName = $('#customerName').val();
+                        const updatedEmail = $('#customerEmail').val();
+                        const updatedCustomerData = { name: updatedName, email: updatedEmail };
+                        try {
+                            const updateResponse = await fetch(`/api/customers/${customerId}/`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(updatedCustomerData)
+                            });
+                            if (updateResponse.ok) {
+                                loadCustomers();
+                            } else {
+                                console.error('Failed to update customer');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            async function deleteCustomer() {
+                const customerId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this customer?')) {
+                    try {
+                        const response = await fetch(`/api/customers/${customerId}/`, {
+                            method: 'DELETE'
+                        });
+                        if (response.ok) {
+                            loadCustomers();
+                        } else {
+                            console.error('Failed to delete customer');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
