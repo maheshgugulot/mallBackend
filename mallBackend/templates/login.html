@@ -7,9 +7,8 @@
 </head>
 <body>
     <h2>Login</h2>
-    <form id="loginForm" action="/login/" method="POST"> 
+    <form id="loginForm" action="{% url 'login' %}" method="POST"> 
         {% csrf_token %}
-        <p>{% csrf_token %}</p>
         <div>
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>

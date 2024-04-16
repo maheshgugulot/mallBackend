@@ -3,18 +3,29 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from . import views
-from .views import login_view, logout_view
-from .views import signup
-from billingsystem.views import ProductListCreateView, ProductRetrieveUpdateDestroyView, \
-                                 CustomerListCreateView, CustomerRetrieveUpdateDestroyView, \
-                                 EmployeeListCreateView, EmployeeRetrieveUpdateDestroyView, \
-                                 SaleListCreateView, AnalyticsAPIView
+from .views import (
+    login_view,
+    logout_view,
+    homeview,
+    signup,
+    ProductListCreateView,
+    ProductRetrieveUpdateDestroyView,
+    CustomerListCreateView,
+    CustomerRetrieveUpdateDestroyView,
+    EmployeeListCreateView,
+    EmployeeRetrieveUpdateDestroyView,
+    SaleListCreateView,
+    AnalyticsAPIView,
+    AnalyticsProductAPIView,
+    BillAPIView,
+)
+
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    path('', views.Home, name='home'),
     path('login/', login_view, name='login'),
+    path('home/', homeview, name='home'),
     path('signup/', signup, name='signup'),
-    path('signuppage/', login_view, name='signuppage'),
     path('logout/', logout_view, name='logout'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -31,4 +42,7 @@ urlpatterns = [
 
     path('api/sales/', SaleListCreateView.as_view(), name='sale-list-create'),
     path('api/analytics/', AnalyticsAPIView.as_view(), name='analytics'),
+    path('api/total/', BillAPIView.as_view(), name='total'),
+    path('api/analytics/product', AnalyticsProductAPIView.as_view(), name='analytics-product'),
+    path('signuppage/', login_view, name='signuppage'),
 ]
