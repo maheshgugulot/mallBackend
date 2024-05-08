@@ -1,5 +1,4 @@
-## Mall Backend 
-
+## Mall Backend [Live](https://mallbackend-1.onrender.com)
 ## Description
 This project is an application designed to manage employee authentication, product management, customer management, and billing for a business. It provides the essential functionalities required for a business to operate smoothly, including authentication of employees, CRUD operations for products and customers, and billing functionality using the cash payment method.
 
