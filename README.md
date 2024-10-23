@@ -18,7 +18,7 @@ The application is deployed on [Render](https://render.com/).
 
 ## Installation
 To install and run this application locally, follow these steps:
-1. Clone the repository: `git clone [GitHub URL]`
+1. Clone the repository: `git clone [https://github.com/maheshgugulot/mallBackend]`
 2. Install the required dependencies: `pip install -r requirements.txt`
 3. Set up the database and configure the database connection settings in `settings.py`
 4. Run the migrations: `python manage.py migrate`
